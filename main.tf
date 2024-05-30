@@ -167,7 +167,7 @@ resource "aws_default_security_group" "infra_dsg" {
     cidr_blocks = [var.default_cidr]
   }
 
-# SSH ports
+  # SSH ports
   # ingress {
   #   protocol  = "tcp"
   #   self      = true
