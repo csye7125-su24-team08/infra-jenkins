@@ -77,7 +77,7 @@ resource "aws_main_route_table_association" "infra_vpc_rta" {
   depends_on = [ aws_vpc.infra_vpc, aws_route_table.infra_rt ]
 }
 
-# Will require in the future
+# Will require in the future 
 # resource "aws_network_interface" "infra_ni" {
 #   subnet_id   = aws_subnet.infra_subnet.id
 #   private_ips = ["10.0.0.10"]
