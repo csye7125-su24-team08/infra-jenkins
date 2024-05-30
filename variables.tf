@@ -28,46 +28,46 @@ variable "default_cidr" {
   default = "0.0.0.0/0"
 }
 
-variable "jenkins_role" {
-  type = string
-  default = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
+# variable "jenkins_role" {
+#   type = string
+#   default = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Action": "sts:AssumeRole",
+#       "Principal": {
+#         "Service": "ec2.amazonaws.com"
+#       },
+#       "Effect": "Allow",
+#       "Sid": ""
+#     }
+#   ]
+# }
+# EOF
+# }
 
-variable "jenkins_policy" {
-  type = string
-  default = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Action": [
-                "route53:GetChange",
-                "route53:ChangeResourceRecordSets",
-                "route53:ListResourceRecordSets",
-                "route53:ListHostedZonesByName"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-EOF
-}
+# variable "jenkins_policy" {
+#   type = string
+#   default = <<EOF
+# {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Sid": "",
+#             "Effect": "Allow",
+#             "Action": [
+#                 "route53:GetChange",
+#                 "route53:ChangeResourceRecordSets",
+#                 "route53:ListResourceRecordSets",
+#                 "route53:ListHostedZonesByName"
+#             ],
+#             "Resource": "*"
+#         }
+#     ]
+# }
+# EOF
+# }
 
 variable "protocol" {
   type = string
@@ -124,13 +124,13 @@ variable "jenkins_dns_ttl" {
   default = 60
 }
 
-variable "startup_script" {
-  type = string
-  default = <<-EOL
-#!/bin/bash -xe
-cd /home/ubuntu
-caddy stop
-caddy fmt --overwrite
-sudo ./caddy run
-EOL
-}
+# variable "startup_script" {
+#   type = string
+#   default = <<-EOL
+# #!/bin/bash -xe
+# cd /home/ubuntu
+# caddy stop
+# caddy fmt --overwrite
+# sudo ./caddy run
+# EOL
+# }

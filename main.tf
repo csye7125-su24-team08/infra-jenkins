@@ -9,8 +9,6 @@ terraform {
 
 provider "aws" {
   region = var.region
-  # shared_config_files = ["$HOME/.aws/config"]
-  # shared_credentials_files = ["$HOME/.aws/credentials"]
   profile = var.profile
 }
 
@@ -28,6 +26,8 @@ resource "aws_internet_gateway" "infra_gw" {
   tags = {
     Name = "infra_gw"
   }
+
+  depends_on = [ aws_vpc.infra_vpc ]
 }
 
 resource "aws_subnet" "infra_subnet" {
@@ -39,6 +39,8 @@ resource "aws_subnet" "infra_subnet" {
   tags = {
     Name = "infra_subnet"
   }
+
+  depends_on = [ aws_vpc.infra_vpc ]
 }
 
 resource "aws_route_table" "infra_rt" {
@@ -57,18 +59,25 @@ resource "aws_route_table" "infra_rt" {
   tags = {
     Name = "tf_route_table"
   }
+
+  depends_on = [ aws_vpc.infra_vpc, aws_internet_gateway.infra_gw ]
 }
 
 resource "aws_route_table_association" "infra_rta" {
   subnet_id      = aws_subnet.infra_subnet.id
   route_table_id = aws_route_table.infra_rt.id
+
+  depends_on = [ aws_subnet.infra_subnet, aws_route_table.infra_rt ]
 }
 
 resource "aws_main_route_table_association" "infra_vpc_rta" {
   vpc_id         = aws_vpc.infra_vpc.id
   route_table_id = aws_route_table.infra_rt.id
+
+  depends_on = [ aws_vpc.infra_vpc, aws_route_table.infra_rt ]
 }
 
+# Will require in the future
 # resource "aws_network_interface" "infra_ni" {
 #   subnet_id   = aws_subnet.infra_subnet.id
 #   private_ips = ["10.0.0.10"]
@@ -85,19 +94,54 @@ resource "aws_main_route_table_association" "infra_vpc_rta" {
 resource "aws_iam_role" "tf_jenkins_role" {
   name = "tf_jenkins_role"
 
-  assume_role_policy = var.jenkins_role
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
 }
 
 resource "aws_iam_instance_profile" "tf_jenkins_profile" {
   name = "tf_jenkins_profile"
   role = aws_iam_role.tf_jenkins_role.name
+
+  depends_on = [ aws_iam_role.tf_jenkins_role ]
 }
 
 resource "aws_iam_role_policy" "tf_jenkins_policy" {
   name = "tf_jenkins_policy"
   role = aws_iam_role.tf_jenkins_role.id
 
-  policy = var.jenkins_policy
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Action": [
+                "route53:GetChange",
+                "route53:ChangeResourceRecordSets",
+                "route53:ListResourceRecordSets",
+                "route53:ListHostedZonesByName"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+
+depends_on = [ aws_iam_role.tf_jenkins_role ]
 }
 
 resource "aws_default_security_group" "infra_dsg" {
@@ -121,14 +165,14 @@ resource "aws_default_security_group" "infra_dsg" {
     cidr_blocks = [var.default_cidr]
   }
 
-  # ingress {
-  #   protocol  = "tcp"
-  #   self      = true
-  #   from_port = 0
-  #   to_port   = 22
-  #   # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  ingress {
+    protocol  = "tcp"
+    self      = true
+    from_port = 0
+    to_port   = 22
+    # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 
   egress {
@@ -137,6 +181,8 @@ resource "aws_default_security_group" "infra_dsg" {
     protocol    = var.jenkins_egress_protocol
     cidr_blocks = [var.default_cidr]
   }
+
+  depends_on = [ aws_vpc.infra_vpc ]
 }
 
 resource "aws_instance" "tf_jenkins" {
@@ -146,11 +192,20 @@ resource "aws_instance" "tf_jenkins" {
   subnet_id     = aws_subnet.infra_subnet.id
   iam_instance_profile = aws_iam_instance_profile.tf_jenkins_profile.name
 
-  user_data = var.startup_script
+  user_data = <<-EOL
+#!/bin/bash -xe
+cd /home/ubuntu
+touch abc.txt
+caddy stop
+caddy fmt --overwrite
+sudo ./caddy run
+EOL
 
   tags = {
     Name = "tf-jenkins"
   }
+
+  depends_on = [ aws_subnet.infra_subnet, aws_iam_instance_profile.tf_jenkins_profile ]
 }
 
 data "aws_eip" "infra_eip" {
@@ -164,6 +219,8 @@ data "aws_route53_zone" "infra_zone" {
 resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.tf_jenkins.id
   allocation_id = data.aws_eip.infra_eip.id
+
+  depends_on = [ aws_instance.tf_jenkins ]
 }
 
 resource "aws_route53_record" "jenkins_dns_rec" {
