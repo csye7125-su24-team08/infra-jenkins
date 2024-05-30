@@ -34,8 +34,8 @@ jobs:
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
-      run: "[[ -z $(terraform fmt -check) ]] || exit 1"
+      run: "terraform fmt -check"
 
     # Generates an execution plan for Terraform
     - name: Terraform Validate
-      run: "[[ -z $(terraform validate) ]] || exit 1"
+      run: "terraform validate"
