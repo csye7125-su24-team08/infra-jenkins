@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  region = var.region
+  region  = var.region
   profile = var.profile
 }
 
@@ -22,25 +22,25 @@ resource "aws_vpc" "infra_vpc" {
 
 resource "aws_internet_gateway" "infra_gw" {
   vpc_id = aws_vpc.infra_vpc.id
-  
+
   tags = {
     Name = "infra_gw"
   }
 
-  depends_on = [ aws_vpc.infra_vpc ]
+  depends_on = [aws_vpc.infra_vpc]
 }
 
 resource "aws_subnet" "infra_subnet" {
   vpc_id            = aws_vpc.infra_vpc.id
   cidr_block        = var.subnet_cidr
   availability_zone = var.availability_zone
-  
+
 
   tags = {
     Name = "infra_subnet"
   }
 
-  depends_on = [ aws_vpc.infra_vpc ]
+  depends_on = [aws_vpc.infra_vpc]
 }
 
 resource "aws_route_table" "infra_rt" {
@@ -60,21 +60,21 @@ resource "aws_route_table" "infra_rt" {
     Name = "tf_route_table"
   }
 
-  depends_on = [ aws_vpc.infra_vpc, aws_internet_gateway.infra_gw ]
+  depends_on = [aws_vpc.infra_vpc, aws_internet_gateway.infra_gw]
 }
 
 resource "aws_route_table_association" "infra_rta" {
   subnet_id      = aws_subnet.infra_subnet.id
   route_table_id = aws_route_table.infra_rt.id
 
-  depends_on = [ aws_subnet.infra_subnet, aws_route_table.infra_rt ]
+  depends_on = [aws_subnet.infra_subnet, aws_route_table.infra_rt]
 }
 
 resource "aws_main_route_table_association" "infra_vpc_rta" {
   vpc_id         = aws_vpc.infra_vpc.id
   route_table_id = aws_route_table.infra_rt.id
 
-  depends_on = [ aws_vpc.infra_vpc, aws_route_table.infra_rt ]
+  depends_on = [aws_vpc.infra_vpc, aws_route_table.infra_rt]
 }
 
 # Will require in the future
@@ -115,7 +115,7 @@ resource "aws_iam_instance_profile" "tf_jenkins_profile" {
   name = "tf_jenkins_profile"
   role = aws_iam_role.tf_jenkins_role.name
 
-  depends_on = [ aws_iam_role.tf_jenkins_role ]
+  depends_on = [aws_iam_role.tf_jenkins_role]
 }
 
 resource "aws_iam_role_policy" "tf_jenkins_policy" {
@@ -141,7 +141,7 @@ resource "aws_iam_role_policy" "tf_jenkins_policy" {
 }
 EOF
 
-depends_on = [ aws_iam_role.tf_jenkins_role ]
+  depends_on = [aws_iam_role.tf_jenkins_role]
 }
 
 resource "aws_default_security_group" "infra_dsg" {
@@ -182,14 +182,14 @@ resource "aws_default_security_group" "infra_dsg" {
     cidr_blocks = [var.default_cidr]
   }
 
-  depends_on = [ aws_vpc.infra_vpc ]
+  depends_on = [aws_vpc.infra_vpc]
 }
 
 resource "aws_instance" "tf_jenkins" {
-  ami               = var.jenkins_ami
-  availability_zone = var.availability_zone
-  instance_type     = var.instance_type
-  subnet_id     = aws_subnet.infra_subnet.id
+  ami                  = var.jenkins_ami
+  availability_zone    = var.availability_zone
+  instance_type        = var.instance_type
+  subnet_id            = aws_subnet.infra_subnet.id
   iam_instance_profile = aws_iam_instance_profile.tf_jenkins_profile.name
 
   user_data = <<-EOL
@@ -205,7 +205,7 @@ EOL
     Name = "tf-jenkins"
   }
 
-  depends_on = [ aws_subnet.infra_subnet, aws_iam_instance_profile.tf_jenkins_profile ]
+  depends_on = [aws_subnet.infra_subnet, aws_iam_instance_profile.tf_jenkins_profile]
 }
 
 data "aws_eip" "infra_eip" {
@@ -220,7 +220,7 @@ resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.tf_jenkins.id
   allocation_id = data.aws_eip.infra_eip.id
 
-  depends_on = [ aws_instance.tf_jenkins ]
+  depends_on = [aws_instance.tf_jenkins]
 }
 
 resource "aws_route53_record" "jenkins_dns_rec" {

@@ -1,30 +1,30 @@
 variable "region" {
-  type = string
+  type    = string
   default = "us-east-1"
 }
 
 variable "profile" {
-  type = string
+  type    = string
   default = "infra"
 }
 
 variable "vpc_cidr" {
-  type = string
+  type    = string
   default = "10.0.0.0/16"
 }
 
 variable "subnet_cidr" {
-  type = string
+  type    = string
   default = "10.0.0.0/24"
 }
 
 variable "availability_zone" {
-  type = string
+  type    = string
   default = "us-east-1a"
 }
 
 variable "default_cidr" {
-  type = string
+  type    = string
   default = "0.0.0.0/0"
 }
 
@@ -70,57 +70,57 @@ variable "default_cidr" {
 # }
 
 variable "protocol" {
-  type = string
+  type    = string
   default = "tcp"
 }
 
 variable "http_port" {
-  type = number
+  type    = number
   default = 80
 }
 
 variable "https_port" {
-  type = number
+  type    = number
   default = 443
 }
 
 variable "jenkins_egress_protocol" {
-  type = string
+  type    = string
   default = "-1"
 }
 
 variable "jenkins_egress_from_port" {
-  type = number
+  type    = number
   default = 0
 }
 
 variable "jenkins_egress_to_port" {
-  type = number
+  type    = number
   default = 0
 }
 
 variable "jenkins_ami" {
-  type = string
+  type    = string
   default = "ami-0824b7052bb75fb6d"
 }
 
 variable "instance_type" {
-  type = string
+  type    = string
   default = "t2.micro"
 }
 
 variable "infra_eip" {
-  type = string
+  type    = string
   default = "eipalloc-00d408691ab4dcba1"
 }
 
 variable "infra_zone" {
-  type = string
+  type    = string
   default = "Z04412832AAIXSHHIZ7VG"
 }
 
 variable "jenkins_dns_ttl" {
-  type = number
+  type    = number
   default = 60
 }
 
