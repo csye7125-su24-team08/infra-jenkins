@@ -119,6 +119,11 @@ variable "infra_zone" {
   default = "Z08982234SRD4BAHIMCU"
 }
 
+variable "infra_domain" {
+  type    = string
+  default = "jenkins.clustering.ninja"
+}
+
 variable "jenkins_dns_ttl" {
   type    = number
   default = 60
