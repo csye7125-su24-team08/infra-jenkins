@@ -167,15 +167,15 @@ resource "aws_default_security_group" "infra_dsg" {
     cidr_blocks = [var.default_cidr]
   }
 
-  # SSH ports
-  ingress {
-    protocol  = "tcp"
-    self      = true
-    from_port = 0
-    to_port   = 22
-    # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # # SSH ports
+  # ingress {
+  #   protocol  = "tcp"
+  #   self      = true
+  #   from_port = 0
+  #   to_port   = 22
+  #   # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
 
   egress {
