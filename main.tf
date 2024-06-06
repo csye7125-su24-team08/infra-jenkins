@@ -168,14 +168,14 @@ resource "aws_default_security_group" "infra_dsg" {
   }
 
   # SSH ports
-  # ingress {
-  #   protocol  = "tcp"
-  #   self      = true
-  #   from_port = 0
-  #   to_port   = 22
-  #   # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  ingress {
+    protocol  = "tcp"
+    self      = true
+    from_port = 0
+    to_port   = 22
+    # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 
   egress {
@@ -195,14 +195,14 @@ resource "aws_instance" "tf_jenkins" {
   subnet_id            = aws_subnet.infra_subnet.id
   iam_instance_profile = aws_iam_instance_profile.tf_jenkins_profile.name
 
-  user_data = <<-EOL
-#!/bin/bash -xe
-cd /home/ubuntu
-touch abc.txt
-caddy stop
-caddy fmt --overwrite
-sudo ./caddy run
-EOL
+  #   user_data = <<-EOL
+  # #!/bin/bash -xe
+  # cd /home/ubuntu
+  # touch abc.txt
+  # caddy stop
+  # caddy fmt --overwrite
+  # sudo ./caddy run
+  # EOL
 
   tags = {
     Name = "tf-jenkins"
@@ -228,7 +228,7 @@ resource "aws_eip_association" "eip_assoc" {
 
 resource "aws_route53_record" "jenkins_dns_rec" {
   zone_id = data.aws_route53_zone.infra_zone.zone_id
-  name    = data.aws_route53_zone.infra_zone.name
+  name    = "jenkins.clustering.ninja"
   type    = "A"
   ttl     = var.jenkins_dns_ttl
   records = [data.aws_eip.infra_eip.public_ip]

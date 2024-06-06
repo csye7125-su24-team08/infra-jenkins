@@ -101,7 +101,7 @@ variable "jenkins_egress_to_port" {
 
 variable "jenkins_ami" {
   type    = string
-  default = "ami-0824b7052bb75fb6d"
+  default = "ami-0183d2c059b159b47"
 }
 
 variable "instance_type" {
@@ -116,7 +116,7 @@ variable "infra_eip" {
 
 variable "infra_zone" {
   type    = string
-  default = "Z04412832AAIXSHHIZ7VG"
+  default = "Z08982234SRD4BAHIMCU"
 }
 
 variable "jenkins_dns_ttl" {
