@@ -228,7 +228,7 @@ resource "aws_eip_association" "eip_assoc" {
 
 resource "aws_route53_record" "jenkins_dns_rec" {
   zone_id = data.aws_route53_zone.infra_zone.zone_id
-  name    = "jenkins.clustering.ninja"
+  name    = var.infra_domain
   type    = "A"
   ttl     = var.jenkins_dns_ttl
   records = [data.aws_eip.infra_eip.public_ip]
