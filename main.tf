@@ -167,15 +167,15 @@ resource "aws_default_security_group" "infra_dsg" {
     cidr_blocks = [var.default_cidr]
   }
 
-  # # SSH ports
-  # ingress {
-  #   protocol  = "tcp"
-  #   self      = true
-  #   from_port = 0
-  #   to_port   = 22
-  #   # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  # SSH ports
+  ingress {
+    protocol  = "tcp"
+    self      = true
+    from_port = 0
+    to_port   = 22
+    # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 
   egress {
@@ -203,6 +203,11 @@ resource "aws_instance" "tf_jenkins" {
   # caddy fmt --overwrite
   # sudo ./caddy run
   # EOL
+
+  root_block_device {
+    volume_size = 30
+    volume_type = "gp3"
+  }
 
   tags = {
     Name = "tf-jenkins"
