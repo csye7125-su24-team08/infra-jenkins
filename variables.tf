@@ -101,12 +101,12 @@ variable "jenkins_egress_to_port" {
 
 variable "jenkins_ami" {
   type    = string
-  default = "ami-0183d2c059b159b47"
+  default = "ami-09274b6f6a7c0600e"
 }
 
 variable "instance_type" {
   type    = string
-  default = "t2.micro"
+  default = "t2.small"
 }
 
 variable "infra_eip" {
@@ -121,7 +121,7 @@ variable "infra_zone" {
 
 variable "infra_domain" {
   type    = string
-  default = "jenkins.clustering.ninja"
+  default = "jenkins1.clustering.ninja"
 }
 
 variable "jenkins_dns_ttl" {
