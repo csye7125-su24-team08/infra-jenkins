@@ -115,18 +115,18 @@ resource "aws_default_security_group" "infra_dsg" {
   vpc_id = aws_vpc.infra_vpc.id
 
   ingress {
-    protocol  = var.protocol
-    self      = true
-    from_port = var.https_port
-    to_port   = var.https_port
+    protocol    = var.protocol
+    self        = true
+    from_port   = var.https_port
+    to_port     = var.https_port
     cidr_blocks = [var.default_cidr]
   }
 
   ingress {
-    protocol  = var.protocol
-    self      = true
-    from_port = var.http_port
-    to_port   = var.http_port
+    protocol    = var.protocol
+    self        = true
+    from_port   = var.http_port
+    to_port     = var.http_port
     cidr_blocks = [var.default_cidr]
   }
 
@@ -152,10 +152,10 @@ resource "aws_default_security_group" "infra_dsg" {
 }
 
 resource "aws_instance" "tf_jenkins" {
-  ami                  = var.jenkins_ami
-  availability_zone    = var.availability_zone
-  instance_type        = var.instance_type
-  subnet_id            = aws_subnet.infra_subnet.id
+  ami               = var.jenkins_ami
+  availability_zone = var.availability_zone
+  instance_type     = var.instance_type
+  subnet_id         = aws_subnet.infra_subnet.id
 
   root_block_device {
     volume_size = 30
@@ -180,7 +180,7 @@ data "aws_route53_zone" "infra_zone" {
 
 resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.tf_jenkins.id
-  allocation_id = aws_eip.jenkins_eip.id 
+  allocation_id = aws_eip.jenkins_eip.id
 
   depends_on = [aws_instance.tf_jenkins]
 }
