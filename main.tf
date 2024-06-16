@@ -77,8 +77,6 @@ resource "aws_main_route_table_association" "infra_vpc_rta" {
   depends_on = [aws_vpc.infra_vpc, aws_route_table.infra_rt]
 }
 
-
-
 # Will require in the future
 # resource "aws_network_interface" "infra_ni" {
 #   subnet_id   = aws_subnet.infra_subnet.id
@@ -113,39 +111,6 @@ resource "aws_iam_role" "tf_jenkins_role" {
 EOF
 }
 
-resource "aws_iam_instance_profile" "tf_jenkins_profile" {
-  name = "tf_jenkins_profile"
-  role = aws_iam_role.tf_jenkins_role.name
-
-  depends_on = [aws_iam_role.tf_jenkins_role]
-}
-
-resource "aws_iam_role_policy" "tf_jenkins_policy" {
-  name = "tf_jenkins_policy"
-  role = aws_iam_role.tf_jenkins_role.id
-
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Action": [
-                "route53:GetChange",
-                "route53:ChangeResourceRecordSets",
-                "route53:ListResourceRecordSets",
-                "route53:ListHostedZonesByName"
-            ],
-            "Resource": "*"
-        }
-    ]
-}
-EOF
-
-  depends_on = [aws_iam_role.tf_jenkins_role]
-}
-
 resource "aws_default_security_group" "infra_dsg" {
   vpc_id = aws_vpc.infra_vpc.id
 
@@ -154,7 +119,6 @@ resource "aws_default_security_group" "infra_dsg" {
     self      = true
     from_port = var.https_port
     to_port   = var.https_port
-    # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
     cidr_blocks = [var.default_cidr]
   }
 
@@ -163,7 +127,6 @@ resource "aws_default_security_group" "infra_dsg" {
     self      = true
     from_port = var.http_port
     to_port   = var.http_port
-    # cidr_blocks = [aws_subnet.infra_subnet.cidr_block]
     cidr_blocks = [var.default_cidr]
   }
 
@@ -193,16 +156,6 @@ resource "aws_instance" "tf_jenkins" {
   availability_zone    = var.availability_zone
   instance_type        = var.instance_type
   subnet_id            = aws_subnet.infra_subnet.id
-  iam_instance_profile = aws_iam_instance_profile.tf_jenkins_profile.name
-
-  #   user_data = <<-EOL
-  # #!/bin/bash -xe
-  # cd /home/ubuntu
-  # touch abc.txt
-  # caddy stop
-  # caddy fmt --overwrite
-  # sudo ./caddy run
-  # EOL
 
   root_block_device {
     volume_size = 30
@@ -213,11 +166,12 @@ resource "aws_instance" "tf_jenkins" {
     Name = "tf-jenkins"
   }
 
-  depends_on = [aws_subnet.infra_subnet, aws_iam_instance_profile.tf_jenkins_profile]
+  depends_on = [aws_subnet.infra_subnet]
 }
 
-data "aws_eip" "infra_eip" {
-  id = var.infra_eip
+// Resource to create an EIP
+resource "aws_eip" "jenkins_eip" {
+  domain = "vpc"
 }
 
 data "aws_route53_zone" "infra_zone" {
@@ -226,7 +180,7 @@ data "aws_route53_zone" "infra_zone" {
 
 resource "aws_eip_association" "eip_assoc" {
   instance_id   = aws_instance.tf_jenkins.id
-  allocation_id = data.aws_eip.infra_eip.id
+  allocation_id = aws_eip.jenkins_eip.id 
 
   depends_on = [aws_instance.tf_jenkins]
 }
@@ -236,5 +190,5 @@ resource "aws_route53_record" "jenkins_dns_rec" {
   name    = var.infra_domain
   type    = "A"
   ttl     = var.jenkins_dns_ttl
-  records = [data.aws_eip.infra_eip.public_ip]
+  records = [aws_eip.jenkins_eip.public_ip]
 }

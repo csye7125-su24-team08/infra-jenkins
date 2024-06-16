@@ -28,47 +28,6 @@ variable "default_cidr" {
   default = "0.0.0.0/0"
 }
 
-# variable "jenkins_role" {
-#   type = string
-#   default = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Action": "sts:AssumeRole",
-#       "Principal": {
-#         "Service": "ec2.amazonaws.com"
-#       },
-#       "Effect": "Allow",
-#       "Sid": ""
-#     }
-#   ]
-# }
-# EOF
-# }
-
-# variable "jenkins_policy" {
-#   type = string
-#   default = <<EOF
-# {
-#     "Version": "2012-10-17",
-#     "Statement": [
-#         {
-#             "Sid": "",
-#             "Effect": "Allow",
-#             "Action": [
-#                 "route53:GetChange",
-#                 "route53:ChangeResourceRecordSets",
-#                 "route53:ListResourceRecordSets",
-#                 "route53:ListHostedZonesByName"
-#             ],
-#             "Resource": "*"
-#         }
-#     ]
-# }
-# EOF
-# }
-
 variable "protocol" {
   type    = string
   default = "tcp"
@@ -109,11 +68,6 @@ variable "instance_type" {
   default = "t2.small"
 }
 
-variable "infra_eip" {
-  type    = string
-  default = "eipalloc-00d408691ab4dcba1"
-}
-
 variable "infra_zone" {
   type    = string
   default = "Z08982234SRD4BAHIMCU"
@@ -121,21 +75,10 @@ variable "infra_zone" {
 
 variable "infra_domain" {
   type    = string
-  default = "jenkins1.clustering.ninja"
+  default = "jenkins.clustering.ninja"
 }
 
 variable "jenkins_dns_ttl" {
   type    = number
   default = 60
 }
-
-# variable "startup_script" {
-#   type = string
-#   default = <<-EOL
-# #!/bin/bash -xe
-# cd /home/ubuntu
-# caddy stop
-# caddy fmt --overwrite
-# sudo ./caddy run
-# EOL
-# }
