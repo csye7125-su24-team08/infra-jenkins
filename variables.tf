@@ -60,12 +60,12 @@ variable "jenkins_egress_to_port" {
 
 variable "jenkins_ami" {
   type    = string
-  default = "ami-09274b6f6a7c0600e"
+  default = "ami-09b63db479a902901"
 }
 
 variable "instance_type" {
   type    = string
-  default = "t2.small"
+  default = "t2.medium"
 }
 
 variable "infra_zone" {
